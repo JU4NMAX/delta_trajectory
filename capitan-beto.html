@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Capitán Beto — Partes del Cohete</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0b0e17;
+      --surface: #131724;
+      --surface2: #1a2035;
+      --border: rgba(255,255,255,0.08);
+      --text: #e8eaf2;
+      --muted: #7b82a0;
+      --accent: #4f8ef7;
+      --rocket-blue: #4f8ef7;
+      --rocket-green: #4caf82;
+      --rocket-amber: #e9a84c;
+      --rocket-red: #e05c5c;
+      --rocket-teal: #3fc3b0;
+      --rocket-dark: #8a8fa8;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Space Grotesk', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 0 0 60px 0;
+    }
+
+    /* ---- HEADER ---- */
+    header {
+      width: 100%;
+      padding: 28px 40px 20px;
+      border-bottom: 0.5px solid var(--border);
+      display: flex;
+      align-items: baseline;
+      gap: 16px;
+    }
+    .header-tag {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      color: var(--accent);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+    header h1 {
+      font-size: 22px;
+      font-weight: 600;
+      color: var(--text);
+    }
+    header p {
+      font-size: 13px;
+      color: var(--muted);
+      margin-left: auto;
+    }
+
+    /* ---- MAIN CONTAINER ---- */
+    main {
+      width: 100%;
+      max-width: 860px;
+      padding: 32px 24px 0;
+    }
+
+    .hint {
+      font-size: 13px;
+      color: var(--muted);
+      text-align: center;
+      margin-bottom: 12px;
+      letter-spacing: 0.3px;
+    }
+
+    /* ---- SVG ROCKET ---- */
+    .rocket-wrap {
+      background: var(--surface);
+      border: 0.5px solid var(--border);
+      border-radius: 16px;
+      padding: 24px 16px 16px;
+      overflow: hidden;
+    }
+
+    .part { cursor: pointer; }
+    .part .shape { transition: opacity 0.15s; }
+    .part:hover .shape { opacity: 0.6; }
+    .part.active .shape { stroke-width: 2.8 !important; }
+
+    .num-badge { transition: transform 0.15s; }
+    .part:hover .num-badge { transform: scale(1.15); }
+    .part.active .num-badge { transform: scale(1.2); }
+
+    /* ---- INFO PANEL ---- */
+    #info-panel {
+      margin-top: 16px;
+      background: var(--surface2);
+      border: 0.5px solid var(--border);
+      border-radius: 14px;
+      padding: 20px 24px;
+      min-height: 96px;
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+      transition: border-color 0.2s;
+    }
+    #info-panel.lit { border-color: rgba(79,142,247,0.35); }
+
+    #info-num {
+      font-size: 36px;
+      font-weight: 600;
+      font-family: 'DM Mono', monospace;
+      min-width: 36px;
+      line-height: 1;
+      margin-top: 2px;
+      color: var(--muted);
+      transition: color 0.2s;
+    }
+    #info-body { flex: 1; }
+    #info-name {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--muted);
+      margin-bottom: 6px;
+      transition: color 0.2s;
+    }
+    #info-desc {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.7;
+      transition: color 0.2s;
+    }
+    #info-desc.active { color: #b8bdd4; }
+
+    /* ---- GRID PARTES ---- */
+    .parts-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 10px;
+      margin-top: 20px;
+    }
+    .part-card {
+      background: var(--surface);
+      border: 0.5px solid var(--border);
+      border-radius: 12px;
+      padding: 12px 14px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      transition: background 0.15s, border-color 0.15s;
+    }
+    .part-card:hover { background: var(--surface2); border-color: rgba(255,255,255,0.14); }
+    .part-card.active { border-color: rgba(79,142,247,0.4); background: var(--surface2); }
+    .card-num {
+      width: 28px; height: 28px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 600; font-family: 'DM Mono', monospace;
+      flex-shrink: 0;
+    }
+    .card-name { font-size: 13px; font-weight: 500; color: var(--text); }
+
+    /* ---- FOOTER ---- */
+    footer {
+      margin-top: 40px;
+      text-align: center;
+      font-size: 12px;
+      color: var(--muted);
+    }
+    footer a { color: var(--accent); text-decoration: none; }
+
+    @media (max-width: 600px) {
+      header { flex-wrap: wrap; padding: 20px 20px 14px; }
+      header p { margin-left: 0; }
+      main { padding: 20px 14px 0; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <span class="header-tag">Cohetería</span>
+  <h1>Capitán Beto</h1>
+  <p>Tercer Concurso Colombiano de Cohetería Deportiva</p>
+</header>
+
+<main>
+  <p class="hint">Toca cualquier parte del cohete — o las tarjetas de abajo — para aprender qué hace</p>
+
+  <div class="rocket-wrap">
+    <svg width="100%" viewBox="0 0 780 240" role="img" xmlns="http://www.w3.org/2000/svg">
+      <title>Capitán Beto — diagrama interactivo</title>
+      <desc>Vista lateral del cohete Capitán Beto con sus 9 partes numeradas e interactivas.</desc>
+
+      <defs>
+        <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+          <path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </marker>
+      </defs>
+
+      <!-- eje central y=120 ; cohete de x=80 a x=570 -->
+
+      <!-- 1. NARIZ -->
+      <g class="part" id="g1" onclick="sel(1)">
+        <path class="shape" d="M80,120 C105,120 130,107 162,103 L162,137 C130,133 105,120 80,120 Z"
+          fill="none" stroke="#4f8ef7" stroke-width="1.6"/>
+        <g class="num-badge" transform="translate(82,88)">
+          <circle r="11" fill="#4f8ef7"/>
+          <text text-anchor="middle" dy="4" font-size="12" fill="white" font-family="'DM Mono',monospace" font-weight="500">1</text>
+        </g>
+        <line x1="82" y1="99" x2="108" y2="112" stroke="#4f8ef7" stroke-width="0.7" stroke-dasharray="3,3"/>
+      </g>
+
+      <!-- 3. FUSELAJE (cuerpo, dibujar primero como fondo) -->
+      <g class="part" id="g3" onclick="sel(3)">
+        <rect class="shape" x="162" y="103" width="340" height="34" rx="0"
+          fill="none" stroke="#4f8ef7" stroke-width="1.6"/>
+        <g class="num-badge" transform="translate(330,80)">
+          <circle r="11" fill="#4f8ef7"/>
+          <text text-anchor="middle" dy="4" font-size="12" fill="white" font-family="'DM Mono',monospace" font-weight="500">3</text>
+        </g>
+        <line x1="330" y1="91" x2="330" y2="103" stroke="#4f8ef7" stroke-width="0.7" stroke-dasharray="3,3"/>
+      </g>
+
+      <!-- 2. CORDÓN DE CHOQUE -->
+      <g class="part" id="g2" onclick="sel(2)">
+        <path class="shape" d="M162,110 Q188,95 210,106 Q232,95 254,106 Q268,99 280,103"
+          fill="none" stroke="#e9a84c" stroke-width="1.8" stroke-dasharray="5,3"/>
+        <g class="num-badge" transform="translate(175,72)">
+          <circle r="11" fill="#e9a84c"/>
+          <text text-anchor="middle" dy="4" font-size="12" fill="white" font-family="'DM Mono',monospace" font-weight="500">2</text>
+        </g>
+        <line x1="175" y1="83" x2="196" y2="100" stroke="#e9a84c" stroke-width="0.7" stroke-dasharray="3,3"/>
+      </g>
+
+      <!-- 5. PARACAÍDAS -->
+      <g class="part" id="g5" onclick="sel(5)">
+        <path class="shape" d="M176,113 Q196,104 216,108 Q236,104 254,113 Q242,122 216,120 Q190,122 176,113Z"
+          fill="none" stroke="#4caf82" stroke-width="1.5" stroke-dasharray="3,2"/>
+        <line x1="186" y1="117" x2="190" y2="124" stroke="#4caf82" stroke-width="0.9"/>
+        <line x1="216" y1="120" x2="216" y2="126" stroke="#4caf82" stroke-width="0.9"/>
+        <line x1="246" y1="117" x2="242" y2="124" stroke="#4caf82" stroke-width="0.9"/>
+        <g class="num-badge" transform="translate(258,72)">
+          <circle r="11" fill="#4caf82"/>
+          <text text-anchor="middle" dy="4" font-size="12" fill="white" font-family="'DM Mono',monospace" font-weight="500">5</text>
+        </g>
+        <line x1="258" y1="83" x2="236" y2="109" stroke="#4caf82" stroke-width="0.7" stroke-dasharray="3,3"/>
+      </g>
+
+      <!-- 6. GUÍAS DE LANZAMIENTO -->
+      <g class="part" id="g6" onclick="sel(6)">
+        <rect class="shape" x="280" y="137" width="16" height="9" rx="1.5" fill="none" stroke="#8a8fa8" stroke-width="1.5"/>
+        <rect class="shape" x="380" y="137" width="16" height="9" rx="1.5" fill="none" stroke="#8a8fa8" stroke-width="1.5"/>
+        <g class="num-badge" transform="translate(310,168)">
+          <circle r="11" fill="#8a8fa8"/>
+          <text text-anchor="middle" dy="4" font-size="12" fill="white" font-family="'DM Mono',monospace" font-weight="500">6</text>
+        </g>
+        <line x1="300" y1="157" x2="296" y2="157" stroke="#8a8fa8" stroke-width="0.7" stroke-dasharray="3,3"/>
+      </g>
+
+      <!-- 4. MONTURA DEL MOTOR -->
+      <g class="part" id="g4" onclick="sel(4)">
+        <rect class="shape" x="442" y="108" width="58" height="24" rx="1"
+          fill="none" stroke="#8a8fa8" stroke-width="1.3" stroke-dasharray="4,2"/>
+        <g class="num-badge" transform="translate(430,168)">
+          <circle r="11" fill="#8a8fa8"/>
+          <text text-anchor="middle" dy="4" font-size="12" fill="white" font-family="'DM Mono',monospace" font-weight="500">4</text>
+        </g>
+        <line x1="443" y1="157" x2="455" y2="132" stroke="#8a8fa8" stroke-width="0.7" stroke-dasharray="3,3"/>
+      </g>
+
+      <!-- 8. MOTOR -->
+      <g class="part" id="g8" onclick="sel(8)">
+        <rect class="shape" x="445" y="110" width="52" height="20" rx="1"
+          fill="#1e2840" stroke="#e05c5c" stroke-width="1.8"/>
+        <text x="471" y="123" text-anchor="middle" font-size="9" fill="#e05c5c" font-family="'DM Mono',monospace" font-weight="500" letter-spacing="0.8">C6-5</text>
+        <g class="num-badge" transform="translate(530,168)">
+          <circle r="11" fill="#e05c5c"/>
+          <text text-anchor="middle" dy="4" font-size="12" fill="white" font-family="'DM Mono',monospace" font-weight="500">8</text>
+        </g>
+        <line x1="521" y1="162" x2="498" y2="130" stroke="#e05c5c" stroke-width="0.7" stroke-dasharray="3,3"/>
+      </g>
+
+      <!-- 7. ALETAS -->
+      <g class="part" id="g7" onclick="sel(7)">
+        <path class="shape" d="M502,103 L550,68 L552,103 Z" fill="none" stroke="#3fc3b0" stroke-width="1.8"/>
+        <path class="shape" d="M502,137 L550,172 L552,137 Z" fill="none" stroke="#3fc3b0" stroke-width="1.8"/>
+        <g class="num-badge" transform="translate(572,88)">
+          <circle r="11" fill="#3fc3b0"/>
+          <text text-anchor="middle" dy="4" font-size="12" fill="white" font-family="'DM Mono',monospace" font-weight="500">7</text>
+        </g>
+        <line x1="562" y1="96" x2="551" y2="103" stroke="#3fc3b0" stroke-width="0.7" stroke-dasharray="3,3"/>
+      </g>
+
+      <!-- Tobera final -->
+      <rect x="500" y="103" width="20" height="34" rx="0" fill="none" stroke="#4f8ef7" stroke-width="1.6"/>
+
+      <!-- 9. IGNITOR -->
+      <g class="part" id="g9" onclick="sel(9)">
+        <line class="shape" x1="520" y1="116" x2="545" y2="120" stroke="#e05c5c" stroke-width="3"/>
+        <circle cx="547" cy="120" r="4" fill="#e05c5c"/>
+        <g class="num-badge" transform="translate(572,152)">
+          <circle r="11" fill="#e05c5c"/>
+          <text text-anchor="middle" dy="4" font-size="12" fill="white" font-family="'DM Mono',monospace" font-weight="500">9</text>
+        </g>
+        <line x1="562" y1="143" x2="548" y2="128" stroke="#e05c5c" stroke-width="0.7" stroke-dasharray="3,3"/>
+      </g>
+
+      <!-- Eje de referencia -->
+      <line x1="80" y1="120" x2="500" y2="120" stroke="rgba(255,255,255,0.06)" stroke-width="0.8" stroke-dasharray="8,5"/>
+    </svg>
+  </div>
+
+  <!-- INFO PANEL -->
+  <div id="info-panel">
+    <div id="info-num">?</div>
+    <div id="info-body">
+      <p id="info-name">Toca una parte del cohete o las tarjetas de abajo</p>
+      <p id="info-desc"></p>
+    </div>
+  </div>
+
+  <!-- GRID DE TARJETAS -->
+  <div class="parts-grid" id="cards-grid"></div>
+
+  <footer>
+    <p>Proyecto Capitán Beto &mdash; Tercer Concurso Colombiano de Cohetería Deportiva &mdash; 5.º lugar nacional</p>
+    <p style="margin-top:6px;">Hecho con ❤️ para que cualquiera pueda aprender sobre cohetería</p>
+  </footer>
+</main>
+
+<script>
+const partes = {
+  1: { nombre: "Nariz",                color: "#4f8ef7",
+       desc: "Es la punta del cohete, con forma aerodinámica. Su trabajo es guiar el aire alrededor del cohete para que pueda subir más rápido y sin perder energía peleando contra el viento. Generalmente es de plástico o balsa." },
+  2: { nombre: "Cordón de choque",     color: "#e9a84c",
+       desc: "Es una cuerda elástica que une la nariz con el fuselaje. Cuando el paracaídas se abre de golpe, este cordón absorbe el jalón para que nada se rompa. ¡Es como el cinturón de seguridad del cohete!" },
+  3: { nombre: "Fuselaje",             color: "#4f8ef7",
+       desc: "Es el cuerpo principal del cohete, el tubo largo que lo sostiene todo. Adentro van las aletas, la nariz, el paracaídas y el motor. Es la estructura base sobre la que se construye todo lo demás." },
+  4: { nombre: "Montura del motor",    color: "#8a8fa8",
+       desc: "Es el soporte que centra y sostiene el motor dentro del fuselaje. Transmite el empuje del motor a todo el cohete para que suba derecho. Sin ella, el motor se movería y el cohete volaría chueco." },
+  5: { nombre: "Paracaídas",           color: "#4caf82",
+       desc: "Es el sistema de recuperación del cohete. Está plegado dentro del fuselaje y cuando el motor termina, se despliega para que el cohete baje lento y no se dañe al aterrizar. En este proyecto se usó hilo de nylon para mayor resistencia." },
+  6: { nombre: "Guías de lanzamiento", color: "#8a8fa8",
+       desc: "Son pequeños tubitos pegados al fuselaje que se deslizan por la varilla de la plataforma de lanzamiento. Mantienen el cohete derecho al inicio del vuelo, cuando va lento y las aletas todavía no pueden estabilizarlo." },
+  7: { nombre: "Aletas",               color: "#3fc3b0",
+       desc: "Son las 'alas' del cohete en la parte de atrás. Funcionan como el plumaje de una flecha: evitan que el cohete se voltee o gire mientras sube. En este proyecto se eligieron aletas largas para lograr mayor estabilidad." },
+  8: { nombre: "Motor (C6-5)",         color: "#e05c5c",
+       desc: "Es el corazón del cohete. El modelo C6-5 significa: C = categoría de potencia, 6 = 6 Newtons de empuje promedio, 5 = 5 segundos de retardo antes de expulsar el paracaídas. Quema combustible sólido y genera los gases que lanzan el cohete." },
+  9: { nombre: "Ignitor",              color: "#e05c5c",
+       desc: "Es el pin eléctrico que enciende el motor. Se conecta a los cables del controlador de lanzamiento y al recibir corriente eléctrica genera una chispa que prende el combustible del motor de forma segura y controlada." }
+};
+
+let active = null;
+
+// Build cards
+const grid = document.getElementById('cards-grid');
+Object.entries(partes).forEach(([n, p]) => {
+  const card = document.createElement('div');
+  card.className = 'part-card';
+  card.id = 'card' + n;
+  card.onclick = () => sel(parseInt(n));
+  card.innerHTML = `
+    <div class="card-num" style="background:${p.color}22; color:${p.color}; border: 0.5px solid ${p.color}55">${n}</div>
+    <span class="card-name">${p.nombre}</span>`;
+  grid.appendChild(card);
+});
+
+function sel(n) {
+  if (active !== null) {
+    const prev = document.getElementById('g' + active);
+    if (prev) prev.classList.remove('active');
+    const prevCard = document.getElementById('card' + active);
+    if (prevCard) prevCard.classList.remove('active');
+  }
+  active = n;
+  const el = document.getElementById('g' + n);
+  if (el) el.classList.add('active');
+  const card = document.getElementById('card' + n);
+  if (card) { card.classList.add('active'); card.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }
+
+  const p = partes[n];
+  const panel = document.getElementById('info-panel');
+  panel.classList.add('lit');
+  panel.style.borderColor = p.color + '55';
+
+  const numEl = document.getElementById('info-num');
+  numEl.textContent = n;
+  numEl.style.color = p.color;
+
+  const nameEl = document.getElementById('info-name');
+  nameEl.textContent = p.nombre;
+  nameEl.style.color = p.color;
+
+  const descEl = document.getElementById('info-desc');
+  descEl.textContent = p.desc;
+  descEl.classList.add('active');
+}
+</script>
+</body>
+</html>
